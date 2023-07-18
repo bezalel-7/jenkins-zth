@@ -1,0 +1,42 @@
+pipeline {
+    agent none
+    stages {
+        stage("Back-end") {
+            agent {
+                docker {
+                    image 'maven:3.8.1-adoptopenjdk-11'
+                }
+            }
+            steps {
+                sh "mvn --version"
+            }
+        }
+        
+        stage("Front-end") {
+            agent {
+                docker {
+                    image 'node:16-alpine'
+                }
+            }
+            steps {
+                sh "node --version"
+            }
+        }
+        
+        stage("Data-base") {
+            agent {
+                docker {
+                    image 'mysql:latest'
+                    environment {
+                        MYSQL_ROOT_PASSWORD = 'password'
+                        MYSQL_DATABASE = 'simba'
+                    }
+                }
+            }
+            steps {
+                sh "mysql -u root -p ${MYSQL_ROOT_PASSWORD} -e 'show databases;'"
+            }
+        }
+    }
+}
+
